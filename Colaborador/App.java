@@ -1,5 +1,7 @@
 package Colaborador;
 
 public class App {
-	System.
+	public static void main(String[] args) {
+		System.
+	}
 }
