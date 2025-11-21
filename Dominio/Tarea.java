@@ -2,6 +2,8 @@ package Dominio;
 
 import java.time.LocalDate;
 
+import Patrones.PatronVisitorTarea;
+
 //Clase Padre
 //Para que hereden una clase, la clase padre tiene  que ser abstract
 /*El txt se divide de la siguiente manera: 
@@ -86,6 +88,27 @@ public abstract class Tarea {
 	}
 	public void setFechaTarea(LocalDate fechaTarea) {
 		FechaTarea = fechaTarea;
+	}
+	public abstract void aceptado(PatronVisitorTarea visitor); 	
+	
+	public abstract int gaetImpacto();
+	
+	public int getValorComplejidad() {
+		if(ComplejidadTarea.equals("Baja")) {
+			return 1;
+		}else {
+			if(ComplejidadTarea.equals("Media")) {
+				return 2;
+		}else {
+			if(ComplejidadTarea.equals("Alta")) {
+				return 3;
+		}else {
+			return 0;
+				}
+		
+			}
+
+		}
 	}
 	
 	
