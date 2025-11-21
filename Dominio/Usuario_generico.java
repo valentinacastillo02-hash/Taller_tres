@@ -35,5 +35,6 @@ public class Usuario_generico {
 	public void setRol(String rol) {
 		Rol = rol;
 	}
+	public boolean  esAdministrador() {return Rol.equals("Administrador");}
 
 }
