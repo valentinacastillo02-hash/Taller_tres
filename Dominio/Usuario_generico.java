@@ -8,6 +8,7 @@ public class Usuario_generico {
 	public Usuario_generico(String Username,String Contraseña,String Rol) {
 		this.setUsername(Username);
 		this.setContraseña(Contraseña);
+		this.setRol(Rol);
 		
 	}
 
