@@ -1,6 +1,3 @@
-//Emiliano Angel Toro Rojas, RUT: 21.512.702-8, Carrera: Ingenieria en tecnologias de información.
-//Valentina Castillo,Rut; 15.166.692-2, Carrera: Ingenieria en tecnologias de información.
-
 package Colaborador;
 
 import java.io.File;
@@ -8,117 +5,217 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import Dominio.Tarea;
+import Dominio.Usuario_generico;
+import Dominio.proyecto;
+import Dominio.usuario_colab;
+import Patrones.FactoryTareas;
+
 public class Main {
-	
-	 private static Sistema sistema;
-	    private static Usuario usuarioActual;
+		    private static Main instancia = null;
+		    private ArrayList<Usuario_generico> usuarios;
+		    private ArrayList<proyecto> proyectos;
+		    private Usuario_generico usuarioActual;
+		    
+		 
+		    private Main() {
+		        usuarios = new ArrayList<Usuario_generico>();
+		        proyectos = new ArrayList<proyecto>();
+		        usuarioActual = null;
+		    }
+		    
+		    
+		    public static Main obtenerInstancia() {
+		        if (instancia == null) {
+		            instancia = new Main();
+		        }
+		        return instancia;
+		    }
+		    
+		   
+		    
+		    public void cargarDatos() {
+		        cargarUsuarios();
+		        cargarProyectos();
+		        cargarTareas();
+		    }
+		    
+		    private void cargarUsuarios() {
+		        try {
+		            File archivo = new File("usuarios.txt");
+		            Scanner scanner = new Scanner(archivo);
+		            
+		            while (scanner.hasNextLine()) {
+		                String linea = scanner.nextLine();
+		                String[] partes = linea.split("\\|");
+		                if (partes.length == 3) {
+		                    Usuario_generico u = new Usuario_generico(partes[0], partes[1], partes[2]);
+		                    usuarios.add(u);
+		                }
+		            }
+		            scanner.close();
+		            System.out.println("[SISTEMA] " + usuarios.size() + " usuarios cargados");
+		        } catch (FileNotFoundException e) {
+		            System.out.println("[ERROR] Archivo usuarios.txt no encontrado");
+		        }
+		    }
+		    
+		    private void cargarProyectos() {
+		        try {
+		            File archivo = new File("proyectos.txt");
+		            Scanner scanner = new Scanner(archivo);
+		            
+		            while (scanner.hasNextLine()) {
+		                String linea = scanner.nextLine();
+		                String[] partes = linea.split("\\|");
+		                if (partes.length == 3) {
+		                    proyecto p = new proyecto(partes[0], partes[1], partes[2]);
+		                    proyectos.add(p);
+		                }
+		            }
+		            scanner.close();
+		            System.out.println("[SISTEMA] " + proyectos.size() + " proyectos cargados");
+		        } catch (FileNotFoundException e) {
+		            System.out.println("[ERROR] Archivo proyectos.txt no encontrado");
+		        }
+		    }
+		    
+		    private void cargarTareas() {
+		        try {
+		            File archivo = new File("tareas.txt");
+		            Scanner scanner = new Scanner(archivo);
+		            int tareasCargadas = 0;
+		            
+		            while (scanner.hasNextLine()) {
+		                String linea = scanner.nextLine();
+		                String[] partes = linea.split("\\|");
+		                if (partes.length == 8) {
+		                    // Usar Factory para crear la tarea según tipo
+		                    Tarea t = Patrones.FactoryTareas.crearTarea(
+		                        partes[0], // proyectoId
+		                        partes[1], // id
+		                        partes[2], // tipo
+		                        partes[3], // descripcion
+		                        partes[4], // estado
+		                        partes[5], // responsable
+		                        partes[6], // complejidad
+		                        partes[7]  // fecha
+		                    );
+		                    
+		                    if (t != null) {
+		                       
+		                        for (proyecto p : proyectos) {
+		                            if (p.getIDProyecto().equals(partes[0])) {
+		                                p.AgregarTarea(t);
+		                                tareasCargadas++;
+		                                break;
+		                            }
+		                        }
+		                    }
+		                }
+		            }
+		            scanner.close();
+		            System.out.println("[SISTEMA] " + tareasCargadas + " tareas cargadas");
+		        } catch (FileNotFoundException e) {
+		            System.out.println("[ERROR] Archivo tareas.txt no encontrado");
+		        }
+		    }
+		    
+		  
+		    
+		    public boolean login(String username, String password) {
+		        for (Usuario_generico u : usuarios) {
+		            if (u.getUsername().equals(username) && u.getContraseña().equals(password)) {
+		                usuarioActual = u;
+		                return true;
+		            }
+		        }
+		        return false;
+		    }
+		    
+		    public Usuario_generico getUsuarioActual() {
+		        return usuarioActual;
+		    }
+		    
+		    public void logout() {
+		        usuarioActual = null;
+		    }
+		    
+		   
+		    
+		    public ArrayList<proyecto> getProyectos() {
+		        return proyectos;
+		    }
+		    
+		    public proyecto buscarProyecto(String id) {
+		        for (proyecto p : proyectos) {
+		            if (p.getIDProyecto().equals(id)) {
+		                return p;
+		            }
+		        }
+		        return null;
+		    }
+		    
+		    public void agregarProyecto(String id, String nombre, String responsable) {
+		        proyecto p = new proyecto(id, nombre, responsable);
+		        proyectos.add(p);
+		        System.out.println("[OK] Proyecto agregado: " + nombre);
+		    }
+		    
+		    public void eliminarProyecto(String id) {
+		        for (int i = 0; i < proyectos.size(); i++) {
+		            if (proyectos.get(i).getIDProyecto().equals(id)) {
+		                System.out.println("[OK] Proyecto eliminado: " + proyectos.get(i).getNombreProyecto());
+		                proyectos.remove(i);
+		                return;
+		            }
+		        }
+		        System.out.println("[ERROR] Proyecto no encontrado");
+		    }
+		    
+		   
+		    
+		    public void agregarTarea(String proyectoId, String id, String tipo, String descripcion,
+		                            String responsable, String complejidad, String fecha) {
+		     
+		        if (!validarDisponibilidad(responsable, fecha)) {
+		            System.out.println("[ERROR] " + responsable + " ya tiene tarea asignada el " + fecha);
+		            return;
+		        }
+		        
+		        proyecto p = buscarProyecto(proyectoId);
+		        if (p != null) {
+		         
+		            Tarea t = FactoryTareas.crearTarea(proyectoId, id, tipo, descripcion, 
+		                                               "Pendiente", responsable, complejidad, fecha);
+		            if (t != null) {
+		                p.AgregarTarea(t);
+		                System.out.println("[OK] Tarea agregada: " + descripcion);
+		            }
+		        } else {
+		            System.out.println("[ERROR] Proyecto no encontrado");
+		        }
+		    }
+		    
+		    private boolean validarDisponibilidad(String responsable, String fecha) {
+		        for (proyecto p : proyectos) {
+		            for (Tarea t : p.gettarea()) {
+		                if (t.getResponsableTarea().equals(responsable) && t.getFechaTarea().equals(fecha)) {
+		                    return false;
+		                }
+		            }
+		        }
+		        return true;
+		    }
+		    
+		    public void eliminarTarea(String proyectoId, String tareaId) {
+		        proyecto p = buscarProyecto(proyectoId);
+		        if (p != null) {
+		            p.EliminarTarea(tareaId);
+		            System.out.println("[OK] Tarea eliminada");
+		        } else {
+		            System.out.println("[ERROR] Proyecto no encontrado");
+		        }
+		    }
 
-	    public static void main(String[] args) {
-	        sistema = Sistema.getInstance();
-	        sistema.cargarDatos();
-	        
-	        Scanner scanner = new Scanner(System.in);
-	        
-	        while (true) {
-	            System.out.println("\n=== SISTEMA DE GESTIÓN DE PROYECTOS ===");
-	            System.out.println("1. Iniciar sesión");
-	            System.out.println("2. Salir");
-	            System.out.print("Seleccione una opción: ");
-	            
-	            int opcion = scanner.nextInt();
-	            scanner.nextLine(); // Limpiar buffer
-	            
-	            switch (opcion) {
-	                case 1:
-	                    iniciarSesion(scanner);
-	                    break;
-	                case 2:
-	                    sistema.guardarDatos();
-	                    System.out.println("¡Hasta luego!");
-	                    return;
-	                default:
-	                    System.out.println("Opción inválida");
-	            }
-	        }
-	    }
-	    
-	    private static void iniciarSesion(Scanner scanner) {
-	        System.out.print("Usuario: ");
-	        String username = scanner.nextLine();
-	        System.out.print("Contraseña: ");
-	        String password = scanner.nextLine();
-	        
-	        usuarioActual = sistema.autenticarUsuario(username, password);
-	        
-	        if (usuarioActual != null) {
-	            System.out.println("¡Bienvenido " + usuarioActual.getUsername() + "!");
-	            if (usuarioActual.getRol().equals("Administrador")) {
-	                mostrarMenuAdministrador(scanner);
-	            } else {
-	                mostrarMenuColaborador(scanner);
-	            }
-	        } else {
-	            System.out.println("Credenciales incorrectas");
-	        }
-	    }
-	    
-	    private static void mostrarMenuAdministrador(Scanner scanner) {
-	        while (true) {
-	            System.out.println("\n=== MENÚ ADMINISTRADOR ===");
-	            System.out.println("1. Ver lista completa de proyectos y tareas");
-	            System.out.println("2. Agregar proyecto");
-	            System.out.println("3. Eliminar proyecto");
-	            System.out.println("4. Agregar tarea");
-	            System.out.println("5. Eliminar tarea");
-	            System.out.println("6. Asignar prioridades (Strategy)");
-	            System.out.println("7. Generar reporte de proyectos");
-	            System.out.println("8. Cerrar sesion");
-	            System.out.print("Seleccione una opción: ");
-	            
-	            int opcion = scanner.nextInt();
-	            scanner.nextLine();
-	            
-	            switch (opcion) {
-	                case 1: sistema.mostrarProyectosYTareas(); break;
-	                case 2: sistema.agregarProyecto(scanner); break;
-	                case 3: sistema.eliminarProyecto(scanner); break;
-	                case 4: sistema.agregarTarea(scanner); break;
-	                case 5: sistema.eliminarTarea(scanner); break;
-	                case 6: sistema.asignarPrioridades(scanner); break;
-	                case 7: sistema.generarReporte(); break;
-	                case 8: return;
-	                default: System.out.println("Opción invalida");
-	            }
-	        }
-	    }
-	    
-	    private static void mostrarMenuColaborador(Scanner scanner) {
-	        while (true) {
-	            System.out.println("\n=== MENÚ COLABORADOR ===");
-	            System.out.println("1. Ver proyectos disponibles");
-	            System.out.println("2. Ver mis tareas asignadas");
-	            System.out.println("3. Actualizar estado de tarea");
-	            System.out.println("4. Aplicar Visitor sobre tareas");
-	            System.out.println("5. Cerrar sesion");
-	            System.out.print("Seleccione una opción: ");
-	            
-	            int opcion = scanner.nextInt();
-	            scanner.nextLine();
-	            
-	            switch (opcion) {
-	                case 1: sistema.mostrarProyectosDisponibles(); break;
-	                case 2: sistema.mostrarTareasAsignadas(usuarioActual.getUsername()); break;
-	                case 3: sistema.actualizarEstadoTarea(scanner, usuarioActual.getUsername()); break;
-	                case 4: sistema.aplicarVisitorTareas(usuarioActual.getUsername()); break;
-	                case 5: return;
-	                default: System.out.println("Opción inválida");
-	            }
-	        }
-	    }
 	}
-
-	
-}
-	
-
-
