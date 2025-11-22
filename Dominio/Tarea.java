@@ -1,6 +1,6 @@
 package Dominio;
 
-import java.time.LocalDate;
+
 
 import Patrones.PatronVisitorTarea;
 
@@ -25,9 +25,9 @@ public abstract class Tarea {
 	protected String EstadoTarea;
 	protected String ResponsableTarea;
 	protected String ComplejidadTarea;
-	protected LocalDate FechaTarea;
+	protected String  FechaTarea;
 	public Tarea(String iD_proyecto, String idTarea, String tipoTarea, String descripcionTarea, String estadoTarea,
-			String responsableTarea, String complejidadTarea, LocalDate fechaTarea) {
+			String responsableTarea, String complejidadTarea, String fechaTarea) {
 		super();
 		this.ID_proyecto = iD_proyecto;
 		this.idTarea = idTarea;
@@ -82,11 +82,11 @@ public abstract class Tarea {
 	public void setComplejidadTarea(String complejidadTarea) {
 		ComplejidadTarea = complejidadTarea;
 	}
-	public LocalDate getFechaTarea() {
+	public String getFechaTarea() {
 		//Strategyy
 		return FechaTarea;
 	}
-	public void setFechaTarea(LocalDate fechaTarea) {
+	public void setFechaTarea(String fechaTarea) {
 		FechaTarea = fechaTarea;
 	}
 	public abstract void aceptado(PatronVisitorTarea visitor); 	
