@@ -1,16 +1,21 @@
 package Dominio;
-//Alta Prioridad
+
 
 
 import Patrones.PatronVisitorTarea;
+
+//Alta Prioridad
+
 
 public class Bug extends Tarea{
 
 	public Bug(String iD_proyecto, String idTarea, String tipoTarea, String descripcionTarea, String estadoTarea,
 			String responsableTarea, String complejidadTarea, String fechaTarea) {
-		super(iD_proyecto, idTarea, tipoTarea, descripcionTarea, estadoTarea, responsableTarea, complejidadTarea,
-				fechaTarea);
+		super( iD_proyecto,  idTarea,  tipoTarea, descripcionTarea,  estadoTarea,
+				 responsableTarea,  complejidadTarea,  fechaTarea);
+		// TODO Auto-generated constructor stub
 	}
+
 	@Override
 	public void aceptado(PatronVisitorTarea visitor) {
 		// TODO Auto-generated method stub
@@ -24,6 +29,9 @@ public class Bug extends Tarea{
 		return 3;
 	}
 
+	
+	}
 
 
-}
+
+
